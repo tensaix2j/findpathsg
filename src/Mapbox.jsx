@@ -233,8 +233,7 @@ function Mapbox() {
     
     //------------------
     useEffect(() => {
-        
-        mapboxgl.accessToken = 'pk.eyJ1IjoidGVuc2FpeDJqIiwiYSI6ImNqN2Zxcm4zNDExYnYyd2t5d3hvZTZzbzQifQ.6awkIkeB3kX1TQqfd6YKwA'
+        mapboxgl.accessToken = 'pk.eyJ1IjoidGVuc2FpeDJqIiwiYSI6ImNtb3dyZWY1ajA0ZXAycHI1dTh3YnpwNGcifQ.uk3ht-4S3lorF_WbRMmb3g'
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             center: [  103.8, 1.39 ], // starting position [lng, lat]. Note that lat must be set between -90 and 90
@@ -257,18 +256,20 @@ function Mapbox() {
         
         mapRef.current.on('load', async () => {
 
-            const res = await fetch('/data/stops.min.geojson')
+            console.log( "hello",import.meta.env.BASE_URL );
+
+            const res = await fetch(`${import.meta.env.BASE_URL}/data/stops.min.geojson`)
             const geojson = await res.json()
 
-            const res2 = await fetch('/data/neighbours.min.json')
+            const res2 = await fetch(`${import.meta.env.BASE_URL}/data/neighbours.min.json`)
             neighboursRef.current = await res2.json()
             
-            mapRef.current.loadImage('/images/startflag.png', (error, image) => {
+            mapRef.current.loadImage(`${import.meta.env.BASE_URL}/images/startflag.png`, (error, image) => {
                 if (error) throw error
                 mapRef.current.addImage('start-icon', image)
             })
 
-            mapRef.current.loadImage('/images/endflag.png', (error, image) => {
+            mapRef.current.loadImage(`${import.meta.env.BASE_URL}/images/endflag.png`, (error, image) => {
                 if (error) throw error
                 mapRef.current.addImage('end-icon', image)
             })
