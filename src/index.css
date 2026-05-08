@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(0, 0, 0, 1.00);
+  background-color: rgb(201, 200, 195);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+.mapboxgl-popup-close-button {
+  font-size: 20px;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  font-weight: bold;
+  color: #333;
+}
+
+.mapboxgl-ctrl-improve-map {
+  display: none !important;
+}
+.mapboxgl-ctrl-logo {
+  display: none !important;
+}
