@@ -158,10 +158,10 @@ export class PathFinder {
         
     //------------------------------
     getDistance( busStops, n_stopId , endId ) {
-        let lat1 = busStops[ n_stopId ][0];
-        let lng1 = busStops[ n_stopId ][1];
-        let lat2 = busStops[ endId ][0];
-        let lng2 = busStops[ endId ][1];
+        let lat1 = busStops[ n_stopId ][1];
+        let lng1 = busStops[ n_stopId ][0];
+        let lat2 = busStops[ endId ][1];
+        let lng2 = busStops[ endId ][0];
         let dist = this.haversine( lat1, lng1, lat2, lng2 );
         return Math.abs( dist );
     }

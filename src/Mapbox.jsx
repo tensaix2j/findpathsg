@@ -2,6 +2,7 @@
 import { useRef, useEffect, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 import { PathFinder } from './pathfinder';
 import { toast } from "react-toastify";
 
@@ -77,6 +78,9 @@ function Mapbox() {
             ]
         })
     }
+
+
+    //------------------
     const markEnd = ( BusStopCode ) => {
 
         if ( mapPopupRef.current) {
@@ -130,7 +134,8 @@ function Mapbox() {
         
         const startCode = startCodeRef.current.value;
         const endCode   = endCodeRef.current.value;
-        
+
+        const plot_route = false; 
         
         if ( neighboursRef.current[startCode] && neighboursRef.current[endCode] ) {
 
@@ -148,11 +153,31 @@ function Mapbox() {
                 for ( let i = 0 ; i < solution.length ; i++ ) {
 
                     let stopCode        = solution[i]
-                    if ( neighboursRef.current[stopCode] ) {
-                        coordinates.push( 
-                            [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1]  ]
-                        )
 
+                    if ( neighboursRef.current[stopCode] ) {
+
+                        
+                        // Lines
+                        if ( plot_route ) {
+                            if ( i == 0 ) {
+                            coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
+
+                            } else {
+                                let prevStopCode = solution[i - 1 ];
+                                let neighbours = neighboursRef.current[ prevStopCode ][4] ;
+
+                                let n_index = neighbours.findIndex( (item) => item[0] == stopCode )
+                                let segment_coords = neighbours[n_index][2]
+                                
+                                coordinates.push( ...segment_coords )
+                                coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
+                                
+                            }
+                        } else { 
+                            coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
+                        }
+
+                        // Labels
                         let start_text  = ""
                         let middle_text = ""
                         let end_text    = ""
@@ -186,9 +211,14 @@ function Mapbox() {
                     }
                 }
 
+                
+                //console.log( "Solution length", solution.length );
+
+                // d
                 mapRef.current.flyTo({
+                    //center: [ neighboursRef.current[startCode][0], neighboursRef.current[startCode][1] ], // longitude, latitude (e.g. Singapore)
                     center: coordinates[0], // longitude, latitude (e.g. Singapore)
-                    zoom: 14,
+                    zoom: 17,
                     speed: 1.2,        // animation speed (higher = faster)
                     curve: 1.42,       // controls the flight path curvature
                     essential: true    // respects reduced-motion preferences
@@ -244,25 +274,21 @@ function Mapbox() {
         });
 
         
-        mapRef.current.addControl(
-            new mapboxgl.GeolocateControl({
-                positionOptions: {
-                    enableHighAccuracy: true
-                },
-                trackUserLocation: true,
-                showUserHeading: true
-            })
-        )
+        const geolocateControl = new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            showUserHeading: true
+        })
+        mapRef.current.addControl( geolocateControl )
         
         mapRef.current.on('load', async () => {
 
-            console.log( "hello",import.meta.env.BASE_URL );
-
-            const res = await fetch(`${import.meta.env.BASE_URL}/data/stops.min.geojson`)
-            const geojson = await res.json()
-
-            const res2 = await fetch(`${import.meta.env.BASE_URL}/data/neighbours.min.json`)
-            neighboursRef.current = await res2.json()
+            geolocateControl.trigger();
+            const stops             = await fetch(`${import.meta.env.BASE_URL}/data/stops.min.geojson`).then( (res)=> res.json() ) 
+            neighboursRef.current   = await fetch(`${import.meta.env.BASE_URL}/data/neighbours.min.json`).then( (res)=> res.json() )
+            
             
             mapRef.current.loadImage(`${import.meta.env.BASE_URL}/images/startflag.png`, (error, image) => {
                 if (error) throw error
@@ -275,11 +301,13 @@ function Mapbox() {
             })
             
 
+
+            // Sources
             mapRef.current.addSource('stops', {
                 type: 'geojson',
-                data: geojson
+                data: stops
             })
-
+            
             mapRef.current.addSource('lines', {
                 type: 'geojson',
                 data: {
@@ -318,6 +346,9 @@ function Mapbox() {
 
 
 
+            //-----
+            // Layers
+
             mapRef.current.addLayer({
                 id: 'stops-layer',
                 type: 'circle',
@@ -329,7 +360,6 @@ function Mapbox() {
                     'circle-stroke-color': 'rgba(0,0,0,0)',
                 }
             })
-
 
             
             mapRef.current.addLayer({
