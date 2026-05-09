@@ -135,8 +135,7 @@ function Mapbox() {
         const startCode = startCodeRef.current.value;
         const endCode   = endCodeRef.current.value;
 
-        const plot_route = false; 
-        
+            
         if ( neighboursRef.current[startCode] && neighboursRef.current[endCode] ) {
 
             markStart( startCode )
@@ -158,24 +157,9 @@ function Mapbox() {
 
                         
                         // Lines
-                        if ( plot_route ) {
-                            if ( i == 0 ) {
-                            coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
-
-                            } else {
-                                let prevStopCode = solution[i - 1 ];
-                                let neighbours = neighboursRef.current[ prevStopCode ][4] ;
-
-                                let n_index = neighbours.findIndex( (item) => item[0] == stopCode )
-                                let segment_coords = neighbours[n_index][2]
-                                
-                                coordinates.push( ...segment_coords )
-                                coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
-                                
-                            }
-                        } else { 
-                            coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
-                        }
+                            
+                        coordinates.push( [ neighboursRef.current[stopCode][0], neighboursRef.current[stopCode][1] ] )
+                        
 
                         // Labels
                         let start_text  = ""
